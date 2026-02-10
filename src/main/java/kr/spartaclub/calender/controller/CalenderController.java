@@ -1,6 +1,6 @@
 package kr.spartaclub.calender.controller;
 
-import kr.spartaclub.calender.dto.*;
+import kr.spartaclub.calender.dtocalender.*;
 import kr.spartaclub.calender.service.CalenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

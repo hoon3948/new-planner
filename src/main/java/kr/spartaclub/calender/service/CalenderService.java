@@ -1,6 +1,6 @@
 package kr.spartaclub.calender.service;
 
-import kr.spartaclub.calender.dto.*;
+import kr.spartaclub.calender.dtocalender.*;
 import kr.spartaclub.calender.entity.Calender;
 import kr.spartaclub.calender.repository.CalenderRepository;
 import lombok.RequiredArgsConstructor;

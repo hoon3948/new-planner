@@ -1,4 +1,4 @@
-package kr.spartaclub.calender.dto;
+package kr.spartaclub.calender.dtocalender;
 
 import kr.spartaclub.calender.entity.Calender;
 import lombok.Getter;
@@ -6,21 +6,21 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class CreateCalenderResponse {
+public class GetCalenderResponse {
+
     private final Long calenderId;
     private final String title;
     private final String content;
     private final String author;
-    private final LocalDateTime createdAT;
+    private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
-
-    public CreateCalenderResponse(Calender calender) {
+    public GetCalenderResponse(Calender calender) {
         this.calenderId = calender.getCalenderId();
         this.title = calender.getTitle();
         this.content = calender.getContent();
         this.author = calender.getAuthor();
-        this.createdAT = calender.getCreatedAt();
+        this.createdAt = calender.getCreatedAt();
         this.modifiedAt = calender.getModifiedAt();
     }
 }

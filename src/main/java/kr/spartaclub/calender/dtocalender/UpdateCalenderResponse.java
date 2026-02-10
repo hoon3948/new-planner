@@ -1,4 +1,4 @@
-package kr.spartaclub.calender.dto;
+package kr.spartaclub.calender.dtocalender;
 
 import kr.spartaclub.calender.entity.Calender;
 import lombok.Getter;
