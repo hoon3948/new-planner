@@ -1,0 +1,88 @@
+package kr.spartaclub.calender.service;
+
+import kr.spartaclub.calender.dto.*;
+import kr.spartaclub.calender.entity.Calender;
+import kr.spartaclub.calender.repository.CalenderRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+
+@Service
+@RequiredArgsConstructor
+public class CalenderService {
+    private final CalenderRepository calenderRepository;
+
+    @Transactional //일정 생성
+    public CreateCalenderResponse save(CreateCalenderRequest request) {
+        Calender calender = new Calender(
+                request.getTitle(),
+                request.getContent(),
+                request.getAuthor(),
+                request.getPassword()
+        );
+        Calender savedCalender = calenderRepository.save(calender);
+        return new CreateCalenderResponse(savedCalender);
+    }
+
+    @Transactional(readOnly = true) //일정 단건 조회
+    public GetCalenderResponse findOne(Long calenderId){
+        Calender calender = calenderRepository.findById(calenderId).orElseThrow(
+                () -> new IllegalStateException("존재하지않는 일정입니다.")
+        );
+
+        return new GetCalenderResponse(calender);
+    }
+
+    @Transactional(readOnly = true) //일정 전체 조회
+    public List<GetCalenderResponse> findAll(String author){
+        List<Calender> calenders = calenderRepository.findAll();
+        List<GetCalenderResponse> dtos = new ArrayList<>();
+
+        if(author == null || author.isBlank()){
+            for (Calender calender : calenders) {
+                GetCalenderResponse dto = new GetCalenderResponse(calender);
+                dtos.add(dto);
+            }
+        }else {
+            for (Calender calender : calenders) {
+                if(calender.getAuthor().equals(author)){
+                    GetCalenderResponse dto = new GetCalenderResponse(calender);
+                    dtos.add(dto);
+                }
+            }
+        }
+        dtos.sort(Comparator.comparing(GetCalenderResponse::getModifiedAt).reversed());
+        //수정일 순으로 역순 정렬
+        return dtos;
+    }
+
+    @Transactional // 일정 단건 수정
+    public UpdateCalenderResponse updateCalender(Long calenderId, UpdateCalenderRequest request) {
+        Calender calender = calenderRepository.findById(calenderId).orElseThrow(
+                () -> new IllegalStateException("존재하지않는 일정입니다.")
+        );
+
+        if(!calender.getPassword().equals(request.getPassword())){
+            throw new IllegalArgumentException("비밀번호가 일치하지않습니다.");
+        }
+        calender.updateCalender(request.getTitle(), request.getAuthor());
+        return new UpdateCalenderResponse(calender);
+    }
+
+    @Transactional // 일정 단건 삭제
+    public void delete(Long calenderId, String password) {
+        Calender calender = calenderRepository.findById(calenderId).orElseThrow(
+                () -> new IllegalStateException("존재하지않는 일정입니다.")
+        );
+
+        if(!calender.getPassword().equals(password)){
+            throw new IllegalArgumentException("비밀번호가 일치하지않습니다.");
+        }
+        calenderRepository.deleteById(calenderId);
+    }
+}
