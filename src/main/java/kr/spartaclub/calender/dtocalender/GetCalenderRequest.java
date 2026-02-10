@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class GetCalenderRequest {
-    private String author;
+    private Long profileId;
 }

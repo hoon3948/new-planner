@@ -6,6 +6,6 @@ import lombok.Getter;
 public class CreateCalenderRequest {
     private String title;
     private String content;
-    private String author;
+    private Long profileId;
     private String password;
 }

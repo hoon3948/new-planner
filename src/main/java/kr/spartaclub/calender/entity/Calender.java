@@ -18,20 +18,26 @@ public class Calender extends BaseEntity{
     private String title;
     @Column(length = 200, nullable = false)
     private String content;
-    @Column(nullable = false)
-    private String author;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id")
+    private Profile profile;
+
+//    @Column(nullable = false)
+//    private String author;
     @Column(nullable = false)
     private String password;
 
-    public Calender(String title, String content, String author, String password){
+    public Calender(String title, String content, Profile profile, String password){
         this.title = title;
         this.content = content;
-        this.author = author;
+        this.profile = profile;
+//        this.author = author;
         this.password = password;
     }
 
-    public void updateCalender(String title, String author){
+    public void updateCalender(String title){
         this.title = title;
-        this.author = author;
+//        this.author = author;
     }
 }

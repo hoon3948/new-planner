@@ -2,7 +2,9 @@ package kr.spartaclub.calender.service;
 
 import kr.spartaclub.calender.dtocalender.*;
 import kr.spartaclub.calender.entity.Calender;
+import kr.spartaclub.calender.entity.Profile;
 import kr.spartaclub.calender.repository.CalenderRepository;
+import kr.spartaclub.calender.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,13 +18,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CalenderService {
     private final CalenderRepository calenderRepository;
+    private final ProfileRepository profileRepository;
 
     @Transactional //일정 생성
     public CreateCalenderResponse save(CreateCalenderRequest request) {
+        Profile profile = profileRepository.findById(request.getProfileId()).orElseThrow(
+                () -> new IllegalStateException("없는 사용자입니다.")
+        );
+
         Calender calender = new Calender(
                 request.getTitle(),
                 request.getContent(),
-                request.getAuthor(),
+                profile,
                 request.getPassword()
         );
         Calender savedCalender = calenderRepository.save(calender);
@@ -39,18 +46,18 @@ public class CalenderService {
     }
 
     @Transactional(readOnly = true) //일정 전체 조회
-    public List<GetCalenderResponse> findAll(String author){
+    public List<GetCalenderResponse> findAll(Long profileId){
         List<Calender> calenders = calenderRepository.findAll();
         List<GetCalenderResponse> dtos = new ArrayList<>();
 
-        if(author == null || author.isBlank()){
+        if(profileId == null){
             for (Calender calender : calenders) {
                 GetCalenderResponse dto = new GetCalenderResponse(calender);
                 dtos.add(dto);
             }
         }else {
             for (Calender calender : calenders) {
-                if(calender.getAuthor().equals(author)){
+                if(calender.getProfile().getUserId().equals(profileId)){
                     GetCalenderResponse dto = new GetCalenderResponse(calender);
                     dtos.add(dto);
                 }
@@ -62,24 +69,30 @@ public class CalenderService {
     }
 
     @Transactional // 일정 단건 수정
-    public UpdateCalenderResponse updateCalender(Long calenderId, UpdateCalenderRequest request) {
+    public UpdateCalenderResponse updateCalender(Long calenderId, Long profileId, UpdateCalenderRequest request) {
         Calender calender = calenderRepository.findById(calenderId).orElseThrow(
                 () -> new IllegalStateException("존재하지않는 일정입니다.")
         );
 
+        if(!calender.getProfile().getUserId().equals(profileId)){
+            throw new IllegalArgumentException("사용자가 일치하지않습니다.");
+        }
         if(!calender.getPassword().equals(request.getPassword())){
             throw new IllegalArgumentException("비밀번호가 일치하지않습니다.");
         }
-        calender.updateCalender(request.getTitle(), request.getAuthor());
+        calender.updateCalender(request.getTitle());
         return new UpdateCalenderResponse(calender);
     }
 
     @Transactional // 일정 단건 삭제
-    public void delete(Long calenderId, String password) {
+    public void delete(Long calenderId, Long profileId, String password) {
         Calender calender = calenderRepository.findById(calenderId).orElseThrow(
                 () -> new IllegalStateException("존재하지않는 일정입니다.")
         );
 
+        if(!calender.getProfile().getUserId().equals(profileId)){
+            throw new IllegalArgumentException("사용자가 일치하지않습니다.");
+        }
         if(!calender.getPassword().equals(password)){
             throw new IllegalArgumentException("비밀번호가 일치하지않습니다.");
         }

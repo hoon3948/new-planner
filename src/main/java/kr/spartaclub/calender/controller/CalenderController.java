@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/calenders")
+@RequestMapping("/profile/{profileId}/calenders")
 public class CalenderController {
     private final CalenderService calenderService;
 
@@ -30,28 +30,30 @@ public class CalenderController {
     }
 
     @GetMapping //일정 전체 조회
-    public ResponseEntity<List<GetCalenderResponse>> getCalenders(@RequestParam(required = false) String author){
+    public ResponseEntity<List<GetCalenderResponse>> getCalenders(@RequestParam(required = false) Long profileId){
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(calenderService.findAll(author));
+                .body(calenderService.findAll(profileId));
     }
 
     @PutMapping("/{calenderId}") // 일정 단건 수정
     public  ResponseEntity<UpdateCalenderResponse> updateCalender(
             @PathVariable Long calenderId,
+            @PathVariable Long profileId,
             @RequestBody UpdateCalenderRequest request
     ){
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(calenderService.updateCalender(calenderId,request));
+                .body(calenderService.updateCalender(calenderId,profileId, request));
     }
 
     @DeleteMapping("/{calenderId}") //일정 단건 삭제
     public ResponseEntity<Void> deleteCalender(
             @PathVariable Long calenderId,
+            @PathVariable Long profileId,
             @RequestBody DeleteCalenderRequest request
     ){
-        calenderService.delete(calenderId, request.getPassword());
+        calenderService.delete(calenderId, profileId, request.getPassword());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -41,7 +41,7 @@ public class ProfileService {
         List<GetProfileResponse> dtos = new ArrayList<>();
 
         for (Profile profile : profiles) {
-            GetProfileResponse dto = new GetProfileResponse();
+            GetProfileResponse dto = new GetProfileResponse(profile);
             dtos.add(dto);
         }
         dtos.sort(Comparator.comparing(GetProfileResponse::getName));
@@ -55,7 +55,7 @@ public class ProfileService {
                 () -> new IllegalStateException("존재하지않는 사용자입니다.")
         );
         if(!profile.getPassword().equals(request.getPassword())){
-            throw new IllegalArgumentException("비밀번호가 일치하지않습니다"):
+            throw new IllegalArgumentException("비밀번호가 일치하지않습니다");
         }
         profile.updateProfile(
                 request.getName(),

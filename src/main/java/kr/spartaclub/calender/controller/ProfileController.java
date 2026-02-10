@@ -37,7 +37,7 @@ public class ProfileController {
                 .body(profileService.findAll());
     }
 
-    @PutMapping("/{userId)")
+    @PutMapping("/{userId}")
     public ResponseEntity<UpdateProfileResponse> updateProfile(
             @PathVariable Long userId,
             @RequestBody UpdateProfileRequest request

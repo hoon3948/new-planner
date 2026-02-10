@@ -6,6 +6,6 @@ import lombok.Getter;
 public class UpdateCalenderRequest {
     private Long calenderId;
     private String title;
-    private String author;
+    private Long profileId;
     private String password;
 }
