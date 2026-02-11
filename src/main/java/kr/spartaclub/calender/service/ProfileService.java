@@ -1,5 +1,6 @@
 package kr.spartaclub.calender.service;
 
+import jakarta.validation.Valid;
 import kr.spartaclub.calender.dtoprofile.*;
 import kr.spartaclub.calender.entity.Profile;
 import kr.spartaclub.calender.repository.ProfileRepository;
@@ -49,14 +50,14 @@ public class ProfileService {
         return dtos;
     }
 
-    @Transactional
+    @Transactional //프로필 단건 수정
     public UpdateProfileResponse updateProfile(Long userId, UpdateProfileRequest request) {
         Profile profile = profileRepository.findById(userId).orElseThrow(
                 () -> new IllegalStateException("존재하지않는 사용자입니다.")
         );
-        if(!profile.getPassword().equals(request.getPassword())){
-            throw new IllegalArgumentException("비밀번호가 일치하지않습니다");
-        }
+//        if(!profile.getPassword().equals(request.getPassword())){
+//            throw new IllegalArgumentException("비밀번호가 일치하지않습니다");
+//        }
         profile.updateProfile(
                 request.getName(),
                 request.getEmail(),
@@ -65,14 +66,28 @@ public class ProfileService {
         return new UpdateProfileResponse(profile);
     }
 
-    @Transactional
-    public void deleteProfile(Long userId, String password){
+    @Transactional // 프로필 단건 삭제
+    public void deleteProfile(Long userId){
         Profile profile = profileRepository.findById(userId).orElseThrow(
                 () -> new IllegalStateException("존재하지않는 사용자입니다.")
         );
-        if(!profile.getPassword().equals(password)){
+        profileRepository.deleteById(userId);
+    }
+
+    @Transactional(readOnly = true) // 로그인
+    public SessionProfile login(@Valid LoginRequest request) {
+        Profile profile = profileRepository.findByEmail(request.getEmail()).orElseThrow(
+                () -> new IllegalStateException("존재하지않는 사용자입니다")
+        );
+
+        if (!profile.getPassword().equals(request.getPassword())){
             throw new IllegalArgumentException("비밀번호가 일치하지않습니다.");
         }
-        profileRepository.deleteById(userId);
+        return new SessionProfile(
+                profile.getUserId(),
+                profile.getName(),
+                profile.getEmail(),
+                profile.getPassword()
+        );
     }
 }

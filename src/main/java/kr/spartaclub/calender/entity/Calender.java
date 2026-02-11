@@ -23,21 +23,14 @@ public class Calender extends BaseEntity{
     @JoinColumn(name = "profile_id")
     private Profile profile;
 
-//    @Column(nullable = false)
-//    private String author;
-    @Column(nullable = false)
-    private String password;
-
-    public Calender(String title, String content, Profile profile, String password){
+    public Calender(String title, String content, Profile profile){
         this.title = title;
         this.content = content;
         this.profile = profile;
-//        this.author = author;
-        this.password = password;
     }
 
-    public void updateCalender(String title){
+    public void updateCalender(String title, String content){
         this.title = title;
-//        this.author = author;
+        this.content = content;
     }
 }

@@ -1,10 +1,18 @@
 package kr.spartaclub.calender.dtoprofile;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import kr.spartaclub.calender.entity.Profile;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@JsonPropertyOrder({
+        "userId",
+        "name",
+        "email",
+        "createdAt",
+        "modifiedAt"
+})
 @Getter
 public class CreateProfileResponse {
     private final Long userId;
