@@ -1,6 +1,7 @@
 package kr.spartaclub.calender.service;
 
 import jakarta.validation.Valid;
+import kr.spartaclub.calender.config.PasswordEncoder;
 import kr.spartaclub.calender.dtoprofile.*;
 import kr.spartaclub.calender.entity.Profile;
 import kr.spartaclub.calender.exception.ErrorCode;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProfileService {
     private final ProfileRepository profileRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional // 프로필 생성
     public void save(CreateProfileRequest request) {
@@ -25,11 +27,12 @@ public class ProfileService {
             throw new ProfileException(ErrorCode.DUPLICATE_EMAIL);
         }// 이메일 중복 확인
 
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         Profile profile = new Profile(
                 request.getName(),
                 request.getEmail(),
-                request.getPassword()
+                encodedPassword
         );
         Profile savedProfile = profileRepository.save(profile);
     }
@@ -57,19 +60,18 @@ public class ProfileService {
     }
 
     @Transactional //프로필 단건 수정
-    public UpdateProfileResponse updateProfile(Long userId, UpdateProfileRequest request) {
+    public void updateProfile(Long userId, UpdateProfileRequest request) {
         Profile profile = profileRepository.findById(userId).orElseThrow(
                 () -> new ProfileException(ErrorCode.PROFILE_NOT_FOUND)
         );
-//        if(!profile.getPassword().equals(request.getPassword())){
-//            throw new IllegalArgumentException("비밀번호가 일치하지않습니다");
-//        }
+
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
         profile.updateProfile(
                 request.getName(),
                 request.getEmail(),
-                request.getPassword()
+                encodedPassword
         );
-        return new UpdateProfileResponse(profile);
     }
 
     @Transactional // 프로필 단건 삭제
@@ -86,9 +88,10 @@ public class ProfileService {
                 () -> new ProfileException(ErrorCode.PROFILE_NOT_FOUND)
         );
 
-        if (!profile.getPassword().equals(request.getPassword())){
+        if (!passwordEncoder.matches(request.getPassword(), profile.getPassword())){
             throw new ProfileException(ErrorCode.INVALID_PASSWORD);
         }
+
         return new SessionProfile(
                 profile.getUserId(),
                 profile.getName(),

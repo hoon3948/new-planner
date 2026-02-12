@@ -24,7 +24,7 @@ public class CalenderController {
     ){
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(calenderService.save(request, sessionProfile.getId()));
+                .body(calenderService.save(request, sessionProfile.id()));
     }
 
     @GetMapping("/{calenderId}") //일정 단건 조회
@@ -49,7 +49,7 @@ public class CalenderController {
     ){
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(calenderService.updateCalender(calenderId, sessionProfile.getId(), request));
+                .body(calenderService.updateCalender(calenderId, sessionProfile.id(), request));
     }
 
     @DeleteMapping("/{calenderId}") //일정 단건 삭제
@@ -57,7 +57,7 @@ public class CalenderController {
             @PathVariable Long calenderId,
             @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile
     ){
-        calenderService.delete(calenderId, sessionProfile.getId());
+        calenderService.delete(calenderId, sessionProfile.id());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

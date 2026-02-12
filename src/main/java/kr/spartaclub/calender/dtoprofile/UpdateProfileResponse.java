@@ -1,14 +1,14 @@
 package kr.spartaclub.calender.dtoprofile;
 
-import kr.spartaclub.calender.entity.Profile;
-import lombok.Getter;
+import lombok.Builder;
 
-@Getter
-public class UpdateProfileResponse {
-    private final Long userId;
-
-    public UpdateProfileResponse(Profile profile) {
-
-        this.userId = profile.getUserId();
+@Builder
+public record UpdateProfileResponse(
+        String name,
+        String message
+) {
+    public static UpdateProfileResponse of(String name, String message) {
+        return UpdateProfileResponse.builder()
+                .name(name).message(message).build();
     }
 }

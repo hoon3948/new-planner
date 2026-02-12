@@ -23,7 +23,7 @@ public class CommentController {
     ){
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(commentService.save(calenderId,sessionProfile.getId(),request));
+                .body(commentService.save(calenderId,sessionProfile.id(),request));
     }
 
 //    @GetMapping("/profile/{profileId}/comments") //내 댓글 조회
@@ -53,7 +53,7 @@ public class CommentController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(commentService
-                        .update(sessionProfile.getId(),commentId,request)
+                        .update(sessionProfile.id(),commentId,request)
                 );
     }
 
@@ -62,7 +62,7 @@ public class CommentController {
             @SessionAttribute(name = "loginProfile") SessionProfile sessionProfile,
             @PathVariable Long commentId
     ){
-        commentService.delete(commentId,sessionProfile.getId());
+        commentService.delete(commentId,sessionProfile.id());
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();

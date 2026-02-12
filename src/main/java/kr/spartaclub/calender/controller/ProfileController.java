@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import kr.spartaclub.calender.common.ApiResponse;
 import kr.spartaclub.calender.dtoprofile.*;
+import kr.spartaclub.calender.exception.ErrorCode;
+import kr.spartaclub.calender.exception.ProfileException;
 import kr.spartaclub.calender.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,22 +31,23 @@ public class ProfileController {
     }
 
     @PostMapping("/login") // 로그인
-    public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest request, HttpSession session) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request, HttpSession session) {
         SessionProfile sessionProfile = profileService.login(request);
         session.setAttribute("loginProfile", sessionProfile);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(LoginResponse.of("로그인 성공!!")));
     }
 
     @PostMapping("/logout") //로그아웃
-    public ResponseEntity<Void> logout(
+    public ResponseEntity<ApiResponse<LoginResponse>> logout(
             @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile,
             HttpSession session
     ) {
         if (sessionProfile == null) {
-            return ResponseEntity.badRequest().build();
+            throw new ProfileException(ErrorCode.STATE_NOT_LOGIN);
         }
         session.invalidate();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.success(LoginResponse.of("로그아웃 완료")));
     }
 
     @GetMapping("/profiles/{profileId}") //프로필 단건 조회
@@ -64,20 +67,22 @@ public class ProfileController {
     }
 
     @PutMapping("/myprofile") //내 프로필 수정
-    public ResponseEntity<UpdateProfileResponse> updateProfile(
+    public ResponseEntity<ApiResponse<UpdateProfileResponse>> updateProfile(
             @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile,
             @RequestBody UpdateProfileRequest request
             ){
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(profileService.updateProfile(sessionProfile.getId(),request));
+                .body(ApiResponse.success(
+                        UpdateProfileResponse.of(request.getName(), "내 프로필 수정이 완료되었습니다."))
+                );
     }
 
     @DeleteMapping("/myprofile") //회원탈퇴
     public ResponseEntity<Void> deleteProfile(
             @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile
     ){
-        profileService.deleteProfile(sessionProfile.getId());
+        profileService.deleteProfile(sessionProfile.id());
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();

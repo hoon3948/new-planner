@@ -16,6 +16,7 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "P005", "댓글을 찾을 수 없습니다."),
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "P006", "비밀번호가 일치하지 않습니다."),
     INVALID_PROFILE(HttpStatus.BAD_REQUEST, "P007", "사용자가 일치하지 않습니다."),
+    STATE_NOT_LOGIN(HttpStatus.BAD_REQUEST,"P008","로그인되어있지않습니다."),
 
     // 공통 에러 (C로 시작)
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "C001", "잘못된 입력값입니다."),
