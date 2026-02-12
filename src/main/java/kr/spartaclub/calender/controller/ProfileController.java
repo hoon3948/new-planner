@@ -3,6 +3,7 @@ package kr.spartaclub.calender.controller;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import kr.spartaclub.calender.common.ApiResponse;
 import kr.spartaclub.calender.dtoprofile.*;
 import kr.spartaclub.calender.service.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +21,11 @@ public class ProfileController {
     private final ProfileService profileService;
 
     @PostMapping("/signup") //회원가입
-    public ResponseEntity<CreateProfileResponse> createProfile(@RequestBody CreateProfileRequest request){
+    public ResponseEntity<ApiResponse<CreateProfileResponse>> createProfile(@Valid @RequestBody CreateProfileRequest request){
+        profileService.save(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(profileService.save(request));
+                .body(ApiResponse.success(CreateProfileResponse.of(request.getName(), "회원가입이 완료되었습니다.")));
     }
 
     @PostMapping("/login") // 로그인

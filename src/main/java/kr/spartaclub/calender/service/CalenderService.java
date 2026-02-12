@@ -1,10 +1,14 @@
 package kr.spartaclub.calender.service;
 
 import kr.spartaclub.calender.dtocalender.*;
-import kr.spartaclub.calender.dtoprofile.SessionProfile;
+import kr.spartaclub.calender.dtocalender.GetSingleCalenderResponse;
 import kr.spartaclub.calender.entity.Calender;
+import kr.spartaclub.calender.entity.Comment;
 import kr.spartaclub.calender.entity.Profile;
+import kr.spartaclub.calender.exception.ErrorCode;
+import kr.spartaclub.calender.exception.ProfileException;
 import kr.spartaclub.calender.repository.CalenderRepository;
+import kr.spartaclub.calender.repository.CommentRepository;
 import kr.spartaclub.calender.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,11 +24,12 @@ import java.util.List;
 public class CalenderService {
     private final CalenderRepository calenderRepository;
     private final ProfileRepository profileRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional //일정 생성
     public CreateCalenderResponse save(CreateCalenderRequest request, Long profileId) {
         Profile profile = profileRepository.findById(profileId).orElseThrow(
-                () -> new IllegalStateException("없는 사용자입니다.")
+                () -> new ProfileException(ErrorCode.PROFILE_NOT_FOUND)
         );
 
         Calender calender = new Calender(
@@ -37,11 +42,20 @@ public class CalenderService {
     }
 
     @Transactional(readOnly = true) //일정 단건 조회
-    public GetCalenderResponse findOne(Long calenderId){
+    public GetSingleCalenderResponse findOne(Long calenderId){
         Calender calender = calenderRepository.findById(calenderId).orElseThrow(
-                () -> new IllegalStateException("존재하지않는 일정입니다.")
+                () -> new ProfileException(ErrorCode.CALENDER_NOT_FOUND)
         );
-        return new GetCalenderResponse(calender);
+
+        List<Comment> comments = commentRepository.findByCalenderCalenderId(calenderId);
+//        List<GetCommentResponse> dtos = new ArrayList<>();
+//        for (Comment comment : comments) {
+//            if (comment.getCalender().getCalenderId().equals(calenderId)){
+//                GetCommentResponse dto = new GetCommentResponse(comment);
+//                dtos.add(dto);
+//            }
+//        }
+        return new GetSingleCalenderResponse(calender);
     }
 
     @Transactional(readOnly = true) //일정 전체 조회
@@ -72,11 +86,11 @@ public class CalenderService {
     @Transactional // 일정 단건 수정
     public UpdateCalenderResponse updateCalender(Long calenderId, Long profileId, UpdateCalenderRequest request) {
         Calender calender = calenderRepository.findById(calenderId).orElseThrow(
-                () -> new IllegalStateException("존재하지않는 일정입니다.")
+                () -> new ProfileException(ErrorCode.CALENDER_NOT_FOUND)
         );
 
         if(!calender.getProfile().getUserId().equals(profileId)){
-            throw new IllegalArgumentException("타인의 일정은 수정할수없습니다.");
+            throw new ProfileException(ErrorCode.INVALID_PROFILE);
         }
 //        if(!calender.getPassword().equals(request.getPassword())){
 //            throw new IllegalArgumentException("비밀번호가 일치하지않습니다.");
@@ -88,7 +102,7 @@ public class CalenderService {
     @Transactional // 일정 단건 삭제
     public void delete(Long calenderId, Long profileId) {
         Calender calender = calenderRepository.findById(calenderId).orElseThrow(
-                () -> new IllegalStateException("존재하지않는 일정입니다.")
+                () -> new ProfileException(ErrorCode.INVALID_PROFILE)
         );
 
         if(!calender.getProfile().getUserId().equals(profileId)){

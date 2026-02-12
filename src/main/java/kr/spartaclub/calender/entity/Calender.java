@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Entity
 @Table(name = "calenders")
@@ -19,9 +22,12 @@ public class Calender extends BaseEntity{
     @Column(length = 200, nullable = false)
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "profile_id")
     private Profile profile;
+
+    @OneToMany(mappedBy = "calender")
+    private List<Comment> comments = new ArrayList<>();
 
     public Calender(String title, String content, Profile profile){
         this.title = title;

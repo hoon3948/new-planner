@@ -1,6 +1,7 @@
 package kr.spartaclub.calender.controller;
 
 import kr.spartaclub.calender.dtocalender.*;
+import kr.spartaclub.calender.dtocalender.GetSingleCalenderResponse;
 import kr.spartaclub.calender.dtoprofile.SessionProfile;
 import kr.spartaclub.calender.service.CalenderService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class CalenderController {
     }
 
     @GetMapping("/{calenderId}") //일정 단건 조회
-    public ResponseEntity<GetCalenderResponse> getCalender(@PathVariable Long calenderId){
+    public ResponseEntity<GetSingleCalenderResponse> getCalender(@PathVariable Long calenderId){
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(calenderService.findOne(calenderId));
