@@ -1,8 +1,10 @@
 package kr.spartaclub.calender.controller;
 
+import kr.spartaclub.calender.common.ApiResponse;
 import kr.spartaclub.calender.dtocalender.*;
-import kr.spartaclub.calender.dtocalender.GetSingleCalenderResponse;
 import kr.spartaclub.calender.dtoprofile.SessionProfile;
+import kr.spartaclub.calender.exception.ErrorCode;
+import kr.spartaclub.calender.exception.ProfileException;
 import kr.spartaclub.calender.service.CalenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,20 +20,25 @@ public class CalenderController {
     private final CalenderService calenderService;
 
     @PostMapping //일정생성
-    public ResponseEntity<CreateCalenderResponse> createCalender(
+    public ResponseEntity<ApiResponse<CreateCalenderResponse>> createCalender(
             @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile,
             @RequestBody CreateCalenderRequest request
     ){
+        if (sessionProfile == null) {
+            throw new ProfileException(ErrorCode.STATE_NOT_LOGIN);
+        }
+        calenderService.save(request, sessionProfile.id());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(calenderService.save(request, sessionProfile.id()));
+                .body(ApiResponse.success(CreateCalenderResponse.of(request.getContent(),"일정 생성이 완료되었습니다.")));
     }
 
     @GetMapping("/{calenderId}") //일정 단건 조회
-    public ResponseEntity<GetSingleCalenderResponse> getCalender(@PathVariable Long calenderId){
+    public ResponseEntity<ApiResponse<GetSingleCalenderResponse>> getCalender(@PathVariable Long calenderId){
+        GetSingleCalenderResponse response = calenderService.findOne(calenderId);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(calenderService.findOne(calenderId));
+                .body(ApiResponse.success(response));
     }
 
     @GetMapping //일정 전체 조회
@@ -47,16 +54,22 @@ public class CalenderController {
             @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile,
             @RequestBody UpdateCalenderRequest request
     ){
+        if (sessionProfile == null) {
+            throw new ProfileException(ErrorCode.STATE_NOT_LOGIN);
+        }
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(calenderService.updateCalender(calenderId, sessionProfile.id(), request));
     }
 
     @DeleteMapping("/{calenderId}") //일정 단건 삭제
-    public ResponseEntity<Void> deleteCalender(
+    public ResponseEntity<ApiResponse<Void>> deleteCalender(
             @PathVariable Long calenderId,
             @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile
     ){
+        if (sessionProfile == null) {
+            throw new ProfileException(ErrorCode.STATE_NOT_LOGIN);
+        }
         calenderService.delete(calenderId, sessionProfile.id());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

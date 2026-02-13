@@ -27,7 +27,7 @@ public class CalenderService {
     private final CommentRepository commentRepository;
 
     @Transactional //일정 생성
-    public CreateCalenderResponse save(CreateCalenderRequest request, Long profileId) {
+    public void save(CreateCalenderRequest request, Long profileId) {
         Profile profile = profileRepository.findById(profileId).orElseThrow(
                 () -> new ProfileException(ErrorCode.PROFILE_NOT_FOUND)
         );
@@ -37,42 +37,33 @@ public class CalenderService {
                 request.getContent(),
                 profile
         );
-        Calender savedCalender = calenderRepository.save(calender);
-        return new CreateCalenderResponse(savedCalender);
+        calenderRepository.save(calender);
     }
 
     @Transactional(readOnly = true) //일정 단건 조회
-    public GetSingleCalenderResponse findOne(Long calenderId){
+    public GetSingleCalenderResponse findOne(Long calenderId) {
         Calender calender = calenderRepository.findById(calenderId).orElseThrow(
                 () -> new ProfileException(ErrorCode.CALENDER_NOT_FOUND)
         );
 
         List<Comment> comments = commentRepository.findByCalenderCalenderId(calenderId);
-//        List<GetCommentResponse> dtos = new ArrayList<>();
-//        for (Comment comment : comments) {
-//            if (comment.getCalender().getCalenderId().equals(calenderId)){
-//                GetCommentResponse dto = new GetCommentResponse(comment);
-//                dtos.add(dto);
-//            }
-//        }
         return new GetSingleCalenderResponse(calender);
     }
 
     @Transactional(readOnly = true) //일정 전체 조회
-    public List<GetCalenderResponse> findAll(Long profileId){
+    public List<GetCalenderResponse> findAll(Long profileId) {
         List<Calender> calenders = calenderRepository.findAll();
         List<GetCalenderResponse> dtos = new ArrayList<>();
 
-        if(profileId == null){
+        if (profileId == null) {
             for (Calender calender : calenders) {
-                //if(calender.getProfile() != null) {
-                    GetCalenderResponse dto = new GetCalenderResponse(calender);
-                    dtos.add(dto);
-                //}
-           }
-        }else {
+                GetCalenderResponse dto = new GetCalenderResponse(calender);
+                dtos.add(dto);
+
+            }
+        } else {
             for (Calender calender : calenders) {
-                if(calender.getProfile().getUserId().equals(profileId)){
+                if (calender.getProfile().getUserId().equals(profileId)) {
                     GetCalenderResponse dto = new GetCalenderResponse(calender);
                     dtos.add(dto);
                 }
@@ -89,7 +80,7 @@ public class CalenderService {
                 () -> new ProfileException(ErrorCode.CALENDER_NOT_FOUND)
         );
 
-        if(!calender.getProfile().getUserId().equals(profileId)){
+        if (!calender.getProfile().getUserId().equals(profileId)) {
             throw new ProfileException(ErrorCode.INVALID_PROFILE);
         }
 //        if(!calender.getPassword().equals(request.getPassword())){
@@ -105,7 +96,7 @@ public class CalenderService {
                 () -> new ProfileException(ErrorCode.INVALID_PROFILE)
         );
 
-        if(!calender.getProfile().getUserId().equals(profileId)){
+        if (!calender.getProfile().getUserId().equals(profileId)) {
             throw new IllegalArgumentException("타인의 일정은 삭제할수없습니다.");
         }
 //        if(!calender.getPassword().equals(password)){

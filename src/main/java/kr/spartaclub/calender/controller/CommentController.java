@@ -2,6 +2,8 @@ package kr.spartaclub.calender.controller;
 
 import kr.spartaclub.calender.dtocomment.*;
 import kr.spartaclub.calender.dtoprofile.SessionProfile;
+import kr.spartaclub.calender.exception.ErrorCode;
+import kr.spartaclub.calender.exception.ProfileException;
 import kr.spartaclub.calender.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,19 +23,13 @@ public class CommentController {
             @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile,
             @RequestBody CreateCommentRequest request
     ){
+        if (sessionProfile == null) {
+            throw new ProfileException(ErrorCode.STATE_NOT_LOGIN);
+        }
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(commentService.save(calenderId,sessionProfile.id(),request));
     }
-
-//    @GetMapping("/profile/{profileId}/comments") //내 댓글 조회
-//    public ResponseEntity<List<GetCommentResponse>> getMyComment(
-//            @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile
-//    ){
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body(commentService.findMine(sessionProfile.getId()));
-//    } // 전체조회랑 중복
 
     @GetMapping("/comments") // 댓글 전체 조회
     public ResponseEntity<List<GetCommentResponse>> getComments(
@@ -50,6 +46,9 @@ public class CommentController {
             @PathVariable Long commentId,
             @RequestBody UpdateCommentRequest request
     ){
+        if (sessionProfile == null) {
+            throw new ProfileException(ErrorCode.STATE_NOT_LOGIN);
+        }
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(commentService
@@ -62,6 +61,9 @@ public class CommentController {
             @SessionAttribute(name = "loginProfile") SessionProfile sessionProfile,
             @PathVariable Long commentId
     ){
+        if (sessionProfile == null) {
+            throw new ProfileException(ErrorCode.STATE_NOT_LOGIN);
+        }
         commentService.delete(commentId,sessionProfile.id());
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)

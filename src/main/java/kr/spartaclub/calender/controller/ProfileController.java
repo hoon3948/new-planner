@@ -23,7 +23,9 @@ public class ProfileController {
     private final ProfileService profileService;
 
     @PostMapping("/signup") //회원가입
-    public ResponseEntity<ApiResponse<CreateProfileResponse>> createProfile(@Valid @RequestBody CreateProfileRequest request){
+    public ResponseEntity<ApiResponse<CreateProfileResponse>> createProfile(
+            @Valid @RequestBody CreateProfileRequest request
+    ){
         profileService.save(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -31,7 +33,9 @@ public class ProfileController {
     }
 
     @PostMapping("/login") // 로그인
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request, HttpSession session) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(
+            @Valid @RequestBody LoginRequest request, HttpSession session
+    ) {
         SessionProfile sessionProfile = profileService.login(request);
         session.setAttribute("loginProfile", sessionProfile);
         return ResponseEntity.status(HttpStatus.OK)
@@ -71,6 +75,7 @@ public class ProfileController {
             @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile,
             @RequestBody UpdateProfileRequest request
             ){
+        profileService.updateProfile(sessionProfile.id(),request);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponse.success(
@@ -79,12 +84,16 @@ public class ProfileController {
     }
 
     @DeleteMapping("/myprofile") //회원탈퇴
-    public ResponseEntity<Void> deleteProfile(
-            @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile
+    public ResponseEntity<ApiResponse<DeleteProfileResponse>> deleteProfile(
+            @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile,
+            HttpSession session
     ){
         profileService.deleteProfile(sessionProfile.id());
+        session.invalidate();
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
-                .build();
+                .body(ApiResponse.success(
+                        DeleteProfileResponse.of("회원탈퇴가 완료되었습니다.")
+                ));
     }
 }
