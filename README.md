@@ -7,9 +7,7 @@
 # 일정 관리 프로그램 만들기
 <img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=150&section=footer" />
 
-___
 
-[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=hoon3948)](https://github.com/anuraghazra/github-readme-stats)
 ___
 ### 목차
 1. API 명세서
@@ -17,9 +15,8 @@ ___
 3. 과제 진행 사항
 
 ___
-___
 # API 명세서
-___
+
 _`HttpStatus.NO_CONTENT`: 메세지 출력을 위해서 `HttpStatus.OK`로 변경해서 사용하였음_
 
 ## 1. [프로필 관리](https://documenter.getpostman.com/view/51111882/2sBXcBmh4B)
@@ -647,16 +644,13 @@ _`HttpStatus.NO_CONTENT`: 메세지 출력을 위해서 `HttpStatus.OK`로 변�
 </details>
 
 ___
-___
 # ERD
-___
 
 ![img.png](img.png)
 
 ___
-___
+
 # 과제 진행 사항
-___
 
 ## 1. 필수과제
 - [x] 일정 CRUD
