@@ -51,23 +51,26 @@ public class ProfileController {
             throw new ProfileException(ErrorCode.STATE_NOT_LOGIN);
         }
         session.invalidate();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.success(LoginResponse.of("로그아웃 완료")));
-    }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(LoginResponse.of("로그아웃 완료")));
+    } //HttpStatus.NO_CONTENT 메세지 출력을 위해서 HttpStatus.OK로 변경
 
     @GetMapping("/profiles/{profileId}") //프로필 단건 조회
-    public ResponseEntity<GetProfileResponse> getProfile(
+    public ResponseEntity<ApiResponse<GetProfileResponse>> getProfile(
             @PathVariable Long profileId
     ){
+        GetProfileResponse dto = profileService.findOne(profileId);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(profileService.findOne(profileId));
+                .body(ApiResponse.successPrint(dto));
     }
 
     @GetMapping("/profiles") // 프로필 전체 조회
-    public ResponseEntity<List<GetProfileResponse>> getProfiles(){
+    public ResponseEntity<ApiResponse<List<GetProfileResponse>>> getProfiles(){
+        List<GetProfileResponse> dtos = profileService.findAll();
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(profileService.findAll());
+                .body(ApiResponse.successPrint(dtos));
     }
 
     @PutMapping("/myprofile") //내 프로필 수정
@@ -91,7 +94,7 @@ public class ProfileController {
         profileService.deleteProfile(sessionProfile.id());
         session.invalidate();
         return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
+                .status(HttpStatus.OK)
                 .body(ApiResponse.success(
                         DeleteProfileResponse.of("회원탈퇴가 완료되었습니다.")
                 ));

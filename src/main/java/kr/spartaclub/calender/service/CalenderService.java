@@ -75,7 +75,7 @@ public class CalenderService {
     }
 
     @Transactional // 일정 단건 수정
-    public UpdateCalenderResponse updateCalender(Long calenderId, Long profileId, UpdateCalenderRequest request) {
+    public void updateCalender(Long calenderId, Long profileId, UpdateCalenderRequest request) {
         Calender calender = calenderRepository.findById(calenderId).orElseThrow(
                 () -> new ProfileException(ErrorCode.CALENDER_NOT_FOUND)
         );
@@ -87,7 +87,7 @@ public class CalenderService {
 //            throw new IllegalArgumentException("비밀번호가 일치하지않습니다.");
 //        }
         calender.updateCalender(request.getTitle(), request.getContent());
-        return new UpdateCalenderResponse(calender);
+//        return new UpdateCalenderResponse(calenderId);
     }
 
     @Transactional // 일정 단건 삭제

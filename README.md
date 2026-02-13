@@ -1,10 +1,32 @@
+![java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring](https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![mySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=150&section=header" />
+
+# 일정 관리 프로그램 만들기
+<img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=150&section=footer" />
 
 ___
-# API
+
+[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=hoon3948)](https://github.com/anuraghazra/github-readme-stats)
 ___
+### 목차
+1. API 명세서
+2. ERD
+3. 과제 진행 사항
+
+___
+___
+# API 명세서
+___
+_`HttpStatus.NO_CONTENT`: 메세지 출력을 위해서 `HttpStatus.OK`로 변경해서 사용하였음_
 
 ## 1. [프로필 관리](https://documenter.getpostman.com/view/51111882/2sBXcBmh4B)
 ### 회원가입
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
   
 | Method |   URL   |   Content-Type   |
@@ -19,9 +41,39 @@ ___
 }
 ```
 - Response
-  - Status code
+  - Status Code: <font color="green"> 201 Created </font>
   - Body
+```json
+{
+  "success": true,
+  "data": {
+    "name": "robo",
+    "message": "회원가입이 완료되었습니다."
+  }
+}
+```
+  - Status Code: <font color="red">404 Bad Request</font>
+  - Body
+```json
+{
+  "success": false,
+  "error": {
+    "code": "P001",
+    "error": "BAD_REQUEST",
+    "message": "이미 존재하는 이메일입니다.",
+    "path": "/signup",
+    "status": 400,
+    "timestamp": "2026-02-13T13:49:24.6242012"
+  }
+}
+```
+
+</details>
+
 ### 로그인
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |  URL   |   Content-Type   |
@@ -35,28 +87,122 @@ ___
 }
 ```
 - Response
-  - Status code
+  - Status code: <font color="green">200 OK</font>
   - Body
+```json
+{
+  "success": true,
+  "data": {
+    "message": "로그인 성공!!"
+  }
+}
+```
+- Response
+  - Status code: <font color="red">404 Not Found</font>
+  - Body
+```json
+{
+    "success": false,
+    "error": {
+        "code": "P003",
+        "error": "NOT_FOUND",
+        "message": "회원을 찾을 수 없습니다.",
+        "path": "/login",
+        "status": 404,
+        "timestamp": "2026-02-13T13:50:51.7283539"
+    }
+}
+```
+  - Status code: <font color="red">401 Unauthorized</font>
+  - Body
+```json
+{
+    "success": false,
+    "error": {
+        "code": "P006",
+        "error": "UNAUTHORIZED",
+        "message": "비밀번호가 일치하지 않습니다.",
+        "path": "/login",
+        "status": 401,
+        "timestamp": "2026-02-13T13:50:02.4319896"
+    }
+}
+```
+</details>
 
 ### 프로필 조회
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |    URL    |   Content-Type   | Query Params |
 |:------:|:---------:|:----------------:|:------------:|
 |  GET   | /profiles | application/json |     name     |
 - Response
-    - Status code
-    - Body
+  - Status Code: <font color="green">200 OK</font>
+  - Body
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "userId": 1,
+            "name": "robo",
+            "modifiedAt": "2026-02-13T13:49:01.313483",
+            "createdAT": "2026-02-13T13:49:01.313483"
+        }
+    ],
+    "message": "출력 성공!"
+}
+```
+</details>
+
 ### 프로필 단건 조회
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |          URL          |   Content-Type   | PathVariable |
 |:------:|:---------------------:|:----------------:|:------------:|
 |  GET   | /profiles/{profileId} | application/json |  profileId   |
 - Response
-    - Status code
-    - Body
+  - Status Code: <font color="green">200 OK</font>
+  - Body
+```json
+{
+    "success": true,
+    "data": {
+        "userId": 1,
+        "name": "robo",
+        "modifiedAt": "2026-02-13T13:49:01.313483",
+        "createdAT": "2026-02-13T13:49:01.313483"
+    },
+    "message": "출력 성공!"
+}
+```
+  - Status Code: <font color="red">404 Not Found</font>
+  - Body
+```json
+{
+  "success": false,
+  "error": {
+    "code": "P003",
+    "error": "NOT_FOUND",
+    "message": "회원을 찾을 수 없습니다.",
+    "path": "/profiles/2",
+    "status": 404,
+    "timestamp": "2026-02-13T13:56:43.4267622"
+  }
+}
+```
+</details>
+
 ### 내 프로필 수정
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |    URL     |   Content-Type   | PathVariable |
@@ -65,35 +211,104 @@ ___
   - Body
 ```json
 {
-    "name":"robo2",
-    "email":"robo2@ex.com",
-    "password":"4321"
+  "name":"robot",
+  "email":"robot@ex.com",
+  "password":"432143"
 }
 ```
 - Response
-    - Status code
-    - Body
+  - Status Code: <font color="green">200 OK</font>
+  - Body
+```json
+{
+  "success": true,
+  "data": {
+    "name": "robot",
+    "message": "내 프로필 수정이 완료되었습니다."
+  }
+}
+```
+</details>
+
 ### 로그아웃
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |   URL   |   Content-Type   |
 |:------:|:-------:|:----------------:|
 |  POST  | /logout | application/json |
 - Response
-  - Status code
+  - Status Code: <font color="green">200 OK</font>
   - Body
+```json
+{
+    "success": true,
+    "data": {
+        "message": "로그아웃 완료"
+    }
+}
+```
+  - Status Code: <font color="red">400 Bad Request</font>
+  - Body
+```json
+{
+    "success": false,
+    "error": {
+        "code": "P008",
+        "error": "BAD_REQUEST",
+        "message": "로그인되어있지않습니다.",
+        "path": "/logout",
+        "status": 400,
+        "timestamp": "2026-02-13T13:57:44.7137019"
+    }
+}
+```
+</details>
+
 ### 회원탈퇴
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |    URL     |   Content-Type   |
 |:------:|:----------:|:----------------:|
 | DELETE | /myprofile | application/json |
 - Response
-    - Status code
-    - Body
+  - Status Code: <font color="green">200 OK</font>
+  - Body
+```json
+{
+    "success": true,
+    "data": {
+        "message": "회원탈퇴가 완료되었습니다."
+    }
+}
+```
+  - Status Code: <font color="red">500 Internal Server Error</font>
+  - Body
+```json
+{
+    "success": false,
+    "error": {
+        "code": "C002",
+        "error": "INTERNAL_SERVER_ERROR",
+        "message": "알 수 없는 에러가 발생했습니다.",
+        "path": "/myprofile",
+        "status": 500,
+        "timestamp": "2026-02-13T13:58:08.9422232"
+    }
+}
+```
+</details>
 
 ## 2. [일정 관리](https://documenter.getpostman.com/view/51111882/2sBXc7MkQH)
 ### 나의 일정 생성
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |    URL     |   Content-Type   |
@@ -107,27 +322,133 @@ ___
 }
 ```
 - Response
-    - Status code
-    - Body
+  - Status Code: <font color="green">201 Created</font>
+  - Body
+```json
+{
+    "success": true,
+    "data": {
+        "content": "3시에 cgv",
+        "message": "일정 생성이 완료되었습니다."
+    }
+}
+```
+  - Status Code: <font color="red">404 Not Found</font>
+  - Body
+```json
+
+```
+</details>
+
+
 ### 일정 전체 조회
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |    URL     |   Content-Type   | Query Params |
 |:------:|:----------:|:----------------:|:------------:|
 |  GET   | /calenders | application/json |  profileId   |
 - Response
-    - Status code
-    - Body
+  - Status Code: <font color="green">200 OK</font>
+  - Body
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "calenderId": 2,
+            "title": "가족 모임",
+            "content": "6시에 집으로",
+            "profileId": 3,
+            "createdAt": "2026-02-13T14:01:36.45683",
+            "modifiedAt": "2026-02-13T14:01:36.45683"
+        },
+        {
+            "calenderId": 1,
+            "title": "영화시청",
+            "content": "3시에 cgv",
+            "profileId": 3,
+            "createdAt": "2026-02-13T13:59:20.005566",
+            "modifiedAt": "2026-02-13T13:59:20.005566"
+        }
+    ],
+    "message": "출력 성공!"
+}
+```
+  - Status Code: <font color="red">404 Not Found</font>
+  - Body
+```json
+
+```
+</details>
+
 ### 일정 단건 조회
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |           URL           |   Content-Type   | PathVariable |
 |:------:|:-----------------------:|:----------------:|:------------:|
 |  GET   | /calenders/{calenderId} | application/json |      id      |
 - Response
-    - Status code
-    - Body
+  - Status Code: <font color="green">200 OK</font>
+  - Body
+```json
+{
+  "success": true,
+  "data": {
+    "calenderId": 1,
+    "title": "영화시청",
+    "content": "3시에 cgv",
+    "profileId": 1,
+    "createdAt": "2026-02-13T14:34:15.550029",
+    "modifiedAt": "2026-02-13T14:34:15.550029",
+    "comments": [
+      {
+        "calenderId": 1,
+        "commentId": 1,
+        "content": "무슨 영화 보러 가는데",
+        "createdAt": "2026-02-13T14:34:19.045405",
+        "modifiedAt": "2026-02-13T14:36:04.734084",
+        "profileId": 1
+      },
+      {
+        "calenderId": 1,
+        "commentId": 2,
+        "content": "언제출발할거야?",
+        "createdAt": "2026-02-13T14:35:09.173496",
+        "modifiedAt": "2026-02-13T14:35:09.173496",
+        "profileId": 1
+      }
+    ]
+  },
+  "message": "출력 성공!"
+}
+```
+  - Status Code: <font color="red">404 Not Found</font>
+  - Body
+```json
+{
+    "success": false,
+    "error": {
+        "code": "P004",
+        "error": "NOT_FOUND",
+        "message": "일정을 찾을 수 없습니다.",
+        "path": "/calenders/3",
+        "status": 404,
+        "timestamp": "2026-02-13T14:02:18.7238855"
+    }
+}
+```
+</details>
+
 ### 나의 일정 수정
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |           URL           |   Content-Type   | PathVariable |
@@ -141,19 +462,76 @@ ___
 }
 ```
 - Response
-    - Status code
-    - Body
+  - Status Code: <font color="green">200 OK</font>
+  - Body
+```json
+{
+    "success": true,
+    "data": {
+        "calenderId": 1,
+        "message": "일정 수정 성공"
+    }
+}
+```
+  - Status Code: <font color="red">404 Not Found</font>
+  - Body
+```json
+{
+    "success": false,
+    "error": {
+        "code": "P004",
+        "error": "NOT_FOUND",
+        "message": "일정을 찾을 수 없습니다.",
+        "path": "/calenders/4",
+        "status": 404,
+        "timestamp": "2026-02-13T14:03:00.978821"
+    }
+}
+```
+</details>
+
 ### 나의 일정 삭제
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |           URL           |   Content-Type   | PathVariable |
 |:------:|:-----------------------:|:----------------:|:------------:|
 | DELETE | /calenders/{calenderId} | application/json |      id      |
 - Response
-    - Status code
-    - Body
+  - Status Code: <font color="green">200 OK</font>
+  - Body
+```json
+{
+    "success": true,
+    "data": {
+        "message": "삭제 성공"
+    }
+}
+```
+  - Status Code: <font color="red">400 Bad Request</font>
+  - Body
+```json
+{
+    "success": false,
+    "error": {
+        "code": "P007",
+        "error": "BAD_REQUEST",
+        "message": "사용자가 일치하지 않습니다.",
+        "path": "/calenders/2",
+        "status": 400,
+        "timestamp": "2026-02-13T14:03:53.9754593"
+    }
+}
+```
+</details>
+
 ## 3. [댓글 관리](https://documenter.getpostman.com/view/51111882/2sBXcBmh4C)
 ### 나의 댓글 등록
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |               URL                |   Content-Type   | PathVariable |
@@ -166,18 +544,61 @@ ___
 }
 ```
 - Response
-    - Status code
-    - Body
-### 댓글 전체 조회 
+  - Status Code: <font color="green">201 Created</font>
+  - Body
+```json
+{
+    "success": true,
+    "data": {
+        "content": "같이 가자",
+        "message": "댓글 생성 성공"
+    }
+}
+```
+</details>
+
+### 댓글 전체 조회
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |    URL    |   Content-Type   | PathVariable | Query Params |
 |:------:|:---------:|:----------------:|:------------:|:------------:|
 |  GET   | /comments | application/json |      id      |  profileId   |
 - Response
-    - Status code
-    - Body
+  - Status Code: <font color="green">200 OK</font>
+  - Body
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "calenderId": 1,
+            "commentId": 1,
+            "content": "같이 가자",
+            "createdAt": "2026-02-13T14:34:19.045405",
+            "modifiedAt": "2026-02-13T14:34:19.045405",
+            "profileId": 1
+        },
+        {
+            "calenderId": 1,
+            "commentId": 2,
+            "content": "언제출발할거야?",
+            "createdAt": "2026-02-13T14:35:09.173496",
+            "modifiedAt": "2026-02-13T14:35:09.173496",
+            "profileId": 1
+        }
+    ],
+    "message": "출력 성공!"
+}
+```
+</details>
+
 ### 나의 댓글 수정
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |          URL           |   Content-Type   | PathVariable |
@@ -190,24 +611,49 @@ ___
 }
 ```
 - Response
-    - Status code
-    - Body
+  - Status Code: <font color="green">200 OK</font>
+  - Body
+```json
+{
+    "success": true,
+    "data": {
+        "commentId": 1,
+        "message": "댓글 수정 완료"
+    }
+}
+```
+</details>
+
 ### 나의 댓글 삭제
+<details>
+<summary>접기/펼치기</summary>
+
 - Request
 
 | Method |          URL          |   Content-Type   | PathVariable |
 |:------:|:---------------------:|:----------------:|:------------:|
 | DELETE | /comments/{commentId} | application/json |      id      |
 - Response
-    - Status code
-    - Body
+  - Status Code: <font color="green">200 OK</font>
+  - Body
+```json
+{
+    "success": true,
+    "data": {
+        "message": "댓글 삭제 성공"
+    }
+}
+```
+</details>
 
+___
 ___
 # ERD
 ___
 
 ![img.png](img.png)
 
+___
 ___
 # 과제 진행 사항
 ___
@@ -257,7 +703,4 @@ ___
   - 일정의 `수정일`을 기준으로 내림차순 정렬합니다.
 
 
-<details>
-<summary>접기/펼치기</summary>
-내용
-</details>
+

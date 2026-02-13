@@ -42,7 +42,9 @@ public class ProfileService {
         Profile profile = profileRepository.findById(userId).orElseThrow(
                 () -> new ProfileException(ErrorCode.PROFILE_NOT_FOUND)
         );
-        return new GetProfileResponse(profile);
+        return new GetProfileResponse(
+                profile
+        );
     }
 
     @Transactional(readOnly = true) //프로필 전체 조회

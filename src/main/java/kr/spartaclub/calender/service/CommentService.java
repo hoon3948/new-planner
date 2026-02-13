@@ -24,7 +24,7 @@ public class CommentService {
     private final ProfileRepository profileRepository;
 
     @Transactional // 댓글 생성
-    public CreateCommentResponse save(
+    public void save(
             Long calenderId, Long profileId, CreateCommentRequest request
     ) {
         Profile profile = profileRepository.findById(profileId).orElseThrow(
@@ -38,7 +38,8 @@ public class CommentService {
                 calender,
                 profile
         );
-        return new CreateCommentResponse(commentRepository.save(comment));
+        commentRepository.save(comment);
+//        return new CreateCommentResponse(commentRepository.save(comment));
     }
 
     @Transactional(readOnly = true) // 댓글 전체 조회
@@ -64,7 +65,7 @@ public class CommentService {
     }
 
     @Transactional // 댓글 수정
-    public UpdateCommentResponse update(Long profileId, Long commentId, UpdateCommentRequest request) {
+    public void update(Long profileId, Long commentId, UpdateCommentRequest request) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new ProfileException(ErrorCode.CALENDER_NOT_FOUND)
         );
@@ -73,7 +74,6 @@ public class CommentService {
             throw new ProfileException(ErrorCode.INVALID_PROFILE);
         }
         comment.updateComment(request.getContent());
-        return new UpdateCommentResponse(comment);
     }
 
     @Transactional // 댓글 삭제

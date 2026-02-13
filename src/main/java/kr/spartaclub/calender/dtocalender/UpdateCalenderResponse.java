@@ -1,13 +1,10 @@
 package kr.spartaclub.calender.dtocalender;
 
-import kr.spartaclub.calender.entity.Calender;
-import lombok.Getter;
+import lombok.Builder;
 
-@Getter
-public class UpdateCalenderResponse {
-    private final Long calenderId;
-
-    public UpdateCalenderResponse(Calender calender) {
-        this.calenderId = calender.getCalenderId();
+@Builder
+public record UpdateCalenderResponse(Long calenderId, String message) {
+    public static UpdateCalenderResponse of(Long calenderId, String message) {
+        return UpdateCalenderResponse.builder().calenderId(calenderId).message(message).build();
     }
 }

@@ -38,18 +38,21 @@ public class CalenderController {
         GetSingleCalenderResponse response = calenderService.findOne(calenderId);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(response));
+                .body(ApiResponse.successPrint(response));
     }
 
     @GetMapping //일정 전체 조회
-    public ResponseEntity<List<GetCalenderResponse>> getCalenders(@RequestParam(required = false) Long profileId){
+    public ResponseEntity<ApiResponse<List<GetCalenderResponse>>> getCalenders(
+            @RequestParam(required = false) Long profileId
+    ){
+        List<GetCalenderResponse> dtos = calenderService.findAll(profileId);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(calenderService.findAll(profileId));
+                .body(ApiResponse.successPrint(dtos));
     }
 
     @PutMapping("/{calenderId}") // 일정 단건 수정
-    public  ResponseEntity<UpdateCalenderResponse> updateCalender(
+    public  ResponseEntity<ApiResponse<UpdateCalenderResponse>> updateCalender(
             @PathVariable Long calenderId,
             @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile,
             @RequestBody UpdateCalenderRequest request
@@ -57,13 +60,14 @@ public class CalenderController {
         if (sessionProfile == null) {
             throw new ProfileException(ErrorCode.STATE_NOT_LOGIN);
         }
+        calenderService.updateCalender(calenderId, sessionProfile.id(), request);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(calenderService.updateCalender(calenderId, sessionProfile.id(), request));
+                .body(ApiResponse.success(UpdateCalenderResponse.of(calenderId,"일정 수정 성공")));
     }
 
     @DeleteMapping("/{calenderId}") //일정 단건 삭제
-    public ResponseEntity<ApiResponse<Void>> deleteCalender(
+    public ResponseEntity<ApiResponse<DeleteCalenderResponse>> deleteCalender(
             @PathVariable Long calenderId,
             @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile
     ){
@@ -71,6 +75,6 @@ public class CalenderController {
             throw new ProfileException(ErrorCode.STATE_NOT_LOGIN);
         }
         calenderService.delete(calenderId, sessionProfile.id());
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(DeleteCalenderResponse.of("삭제 성공")));
     }
 }

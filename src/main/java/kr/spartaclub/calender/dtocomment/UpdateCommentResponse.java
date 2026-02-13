@@ -1,13 +1,12 @@
 package kr.spartaclub.calender.dtocomment;
 
-import kr.spartaclub.calender.entity.Comment;
-import lombok.Getter;
+import lombok.Builder;
 
-@Getter
-public class UpdateCommentResponse {
-    private final Long commentId;
+@Builder
+public record UpdateCommentResponse(Long commentId, String message){
 
-    public UpdateCommentResponse(Comment comment) {
-        this.commentId = comment.getCommentId();
+    public static UpdateCommentResponse of(Long commentId, String message) {
+        return UpdateCommentResponse.builder()
+                .commentId(commentId).message(message).build();
     }
 }

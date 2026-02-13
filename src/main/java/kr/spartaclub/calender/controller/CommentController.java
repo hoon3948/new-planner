@@ -1,5 +1,6 @@
 package kr.spartaclub.calender.controller;
 
+import kr.spartaclub.calender.common.ApiResponse;
 import kr.spartaclub.calender.dtocomment.*;
 import kr.spartaclub.calender.dtoprofile.SessionProfile;
 import kr.spartaclub.calender.exception.ErrorCode;
@@ -18,7 +19,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/calenders/{calenderId}/comments") // 댓글생성
-    public ResponseEntity<CreateCommentResponse> createComment(
+    public ResponseEntity<ApiResponse<CreateCommentResponse>> createComment(
             @PathVariable Long calenderId,
             @SessionAttribute(name = "loginProfile", required = false) SessionProfile sessionProfile,
             @RequestBody CreateCommentRequest request
@@ -26,22 +27,24 @@ public class CommentController {
         if (sessionProfile == null) {
             throw new ProfileException(ErrorCode.STATE_NOT_LOGIN);
         }
+        commentService.save(calenderId,sessionProfile.id(),request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(commentService.save(calenderId,sessionProfile.id(),request));
+                .body(ApiResponse.success(CreateCommentResponse.of(request.getContent(),"댓글 생성 성공")));
     }
 
     @GetMapping("/comments") // 댓글 전체 조회
-    public ResponseEntity<List<GetCommentResponse>> getComments(
+    public ResponseEntity<ApiResponse<List<GetCommentResponse>>> getComments(
             @RequestParam(required = false) Long profileId
     ){
+        List<GetCommentResponse> dtoes = commentService.findAll(profileId);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(commentService.findAll(profileId));
+                .body(ApiResponse.successPrint(dtoes));
     }
 
     @PutMapping("/comments/{commentId}") //댓글 수정
-    public ResponseEntity<UpdateCommentResponse> updateComment(
+    public ResponseEntity<ApiResponse<UpdateCommentResponse>> updateComment(
             @SessionAttribute(name = "loginProfile") SessionProfile sessionProfile,
             @PathVariable Long commentId,
             @RequestBody UpdateCommentRequest request
@@ -49,15 +52,14 @@ public class CommentController {
         if (sessionProfile == null) {
             throw new ProfileException(ErrorCode.STATE_NOT_LOGIN);
         }
+        commentService.update(sessionProfile.id(),commentId,request);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(commentService
-                        .update(sessionProfile.id(),commentId,request)
-                );
+                .body(ApiResponse.success(UpdateCommentResponse.of(commentId,"댓글 수정 완료")));
     }
 
     @DeleteMapping("/comments/{commentId}") //댓글 삭제
-    public ResponseEntity<Void> deleteComment(
+    public ResponseEntity<ApiResponse<DeleteCommentResponse>> deleteComment(
             @SessionAttribute(name = "loginProfile") SessionProfile sessionProfile,
             @PathVariable Long commentId
     ){
@@ -66,7 +68,7 @@ public class CommentController {
         }
         commentService.delete(commentId,sessionProfile.id());
         return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .build();
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(DeleteCommentResponse.of("댓글 삭제 성공")));
     }
 }
